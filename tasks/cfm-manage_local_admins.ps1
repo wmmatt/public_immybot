@@ -1,7 +1,14 @@
 [Net.ServicePointManager]::SecurityProtocol = [Enum]::ToObject([Net.SecurityProtocolType], 3072);
-(New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/dkbrookie/PowershellFunctions/master/Library.Users.ps1') | Invoke-Expression
+(New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/wmmatt/private_powershell_libraries/main/local_user_library.ps1?token=GHSAT0AAAAAACBHO7XFAIQBZVPTLG5ZF6PMZB7MFJA') | Invoke-Expression
 $builtinAdmin = Get-BuiltInAdministrator
-$ApprovedLocalAdmin = $ApprovedLocalAdmin + $EnforcedLocalAdmins
+
+# Split each param
+$ApprovedLocalAdmins = $ApprovedLocalAdmins.Split(',')
+$EnforcedLocalAdmins = $EnforcedLocalAdmins.Split(',')
+$UsersToDisable      = $UsersToDisable.Split(',')
+
+# Aggregate all approved admins
+$ApprovedLocalAdmins = $ApprovedLocalAdmins + $EnforcedLocalAdmins + $builtinAdmin.Name
 
 switch($method)
 {
@@ -10,27 +17,29 @@ switch($method)
         If ($EnforcedLocalAdmins) {
             $EnforcedLocalAdmins | ForEach-Object {
                 If (!(Get-LocalUserExists -UserName $_) -or !(Get-IsLocalAdmin -UserName $_)) {
-                    $enforcedStatus = $False
-                } Else {
-                    $enforcedStatus = $True
+                    $enforcedStatus = 'fail'
                 }
             }
+        }
+        If ($enforcedStatus -eq 'fail') {
+            $enforcedStatus = $False
         } Else {
-            # This would mean $EnforcedLocalAdmins was not defined, so the status of this is good
             $enforcedStatus = $True
         }
 
         # Check to ensure $UsersToDisable are currently all disabled
         If ($UsersToDisable) {
             $UsersToDisable | ForEach-Object {
-                If ((Get-LocalUserStatus -UserName $_).Enabled) {
-                    $disableStatus = $False
-                } Else {
-                    $disableStatus = $True
+                If ((Get-LocalUserExists $_)) {
+                    If ((Get-LocalUserStatus -UserName $_).Enabled) {
+                        $disableStatus = 'fail'
+                    }
                 }
             }
+        }
+        If($disableStatus -eq 'fail') {
+            $disableStatus = $False
         } Else {
-            # This would mean $UsersToDisable was not defined, so the status of this is good
             $disableStatus = $True
         }
 
@@ -41,8 +50,18 @@ switch($method)
             $builtinStatus = $True
         }
 
+        # Check for approved local admins and remove all users from local admin group that are not approved
+        $localAdmins = (Get-LocalAdminGroupMembers).Name
+        $compare = Compare-Object -ReferenceObject $localAdmins -DifferenceObject $ApprovedLocalAdmins
+        # This would indicate a local admin exists that is NOT defined in approved local admins
+        If ($compare.SideIndicator -contains '<=') {
+            $approvedStatus = $False
+        } Else {
+            $approvedStatus = $True
+        }
+
         # Return our end result
-        If (!$enforcedStatus -or !$disableStatus -or !$builtinStatus) {
+        If (!$enforcedStatus -or !$disableStatus -or !$builtinStatus -or !$approvedStatus) {
             Return $False
         } Else {
             Return $True
@@ -87,7 +106,7 @@ switch($method)
         }
 
         # Remove all users from the local Administrators group that have not been specified to stay
-        Get-LocalAdminGroupMembers | Where-Object { $_.Name -notin $ApprovedLocalAdmin -and $_.Name -ne $builtinAdmin.Name } | ForEach-Object {
+        Get-LocalAdminGroupMembers | Where-Object { $_.Name -notin $ApprovedLocalAdmins -and $_.Name -ne $builtinAdmin.Name } | ForEach-Object {
             Remove-FromLocalAdminGroup -UserName $_.Name
         }
 
