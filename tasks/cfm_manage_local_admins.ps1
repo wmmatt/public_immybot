@@ -1,3 +1,4 @@
+# Git URL: https://github.com/wmmatt/private_immybot/blob/main/tasks/cfm_manage_local_admins.ps1
 [Net.ServicePointManager]::SecurityProtocol = [Enum]::ToObject([Net.SecurityProtocolType], 3072);
 (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/wmmatt/private_powershell_libraries/main/local_user_library.ps1?token=GHSAT0AAAAAACBHO7XFAIQBZVPTLG5ZF6PMZB7MFJA') | Invoke-Expression
 $builtinAdmin = Get-BuiltInAdministrator
