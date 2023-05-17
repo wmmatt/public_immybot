@@ -1,6 +1,18 @@
-# Git URL: https://github.com/wmmatt/private_immybot/blob/main/tasks/cfm_manage_local_admins.ps1
+<#
+    .DESCRIPTION
+    ## Description
+    This task is intended to check and enforce the desired local admin state of all endpoints, excluding domain controllers which fall out of scope of "local users" (the script will automatically error out on domain controllers).
+
+    - Any users specified in the `ApprovedLocalAdmins` parameter will be left as an admin. If a user currently has admin and is included in this list, even after an enforce run, they will continue to be a local admin. However, if a user is a local admin and they are NOT included in this list, they will be removed from local admin on next enforce run.
+    - Any users specified in the `EnforcedLocalAdmins` parameter will be created if they do not exist, and will be added to the local Administrator group.
+    - Any users specified in the `UsersToDisable` parameter will be disabled (Disabled not deleted in order to keep event log activities tied to a NAME and not just a SID)
+    - The built-in Administrator account will be disabled automatically by this script, regardless of the name being changed or not (Account is looked up by SID not name) (Disabled not deleted in order to keep event log activities tied to a NAME and not just a SID)
+
+    Note all of the heavy lifting is coming from the library of functions here: https://github.com/dkbrookie/PowershellFunctions/blob/master/Library.Users.ps1
+#>
+
 [Net.ServicePointManager]::SecurityProtocol = [Enum]::ToObject([Net.SecurityProtocolType], 3072);
-(New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/wmmatt/private_powershell_libraries/main/local_user_library.ps1?token=GHSAT0AAAAAACBHO7XFAIQBZVPTLG5ZF6PMZB7MFJA') | Invoke-Expression
+(New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/dkbrookie/PowershellFunctions/master/Library.Users.ps1') | Invoke-Expression
 $builtinAdmin = Get-BuiltInAdministrator
 
 # Split each param
