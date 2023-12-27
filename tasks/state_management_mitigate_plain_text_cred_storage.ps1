@@ -6,16 +6,17 @@
 
     This Task is designed to check the current configuration of the WDigest reg key for "UseLogonCredential", then to disable WDigest if it finds it is not already disabled.
 #>
+$method = 'test'
+$registryPath = 'HKLM:\\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest'
+$registryName = 'UseLogonCredential'
+$value = 0
 
 Switch ($method) {
     'test' {
-        # The desired value is 0 to disable plain text creds so if true, we're good!
-        # Note that when ran as Audit, $method -ne 'Set' which means this will just check the value and return truthy/falsy and not actually set it
-        Get-WindowsRegistryValue -Path 'HKLM:\\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest' -Name UseLogonCredential | RegistryShould-Be -Value 0
+        Confirm-RegistryValue -Path $registryPath -Name $registryName -Value $value -Method $method
     }
 
     'set' {
-        # Setting this value to 0 disables plain text creds in memory
-        Get-WindowsRegistryValue -Path 'HKLM:\\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest' -Name UseLogonCredential | RegistryShould-Be -Value 0
+        Confirm-RegistryValue -Path $registryPath -Name $registryName -Value $value -Method $method
     }
 }
