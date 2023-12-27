@@ -7,8 +7,6 @@
     - Any users specified in the `EnforcedLocalAdmins` parameter will be created if they do not exist, and will be added to the local Administrator group.
     - Any users specified in the `UsersToDisable` parameter will be disabled (Disabled not deleted in order to keep event log activities tied to a NAME and not just a SID)
     - The built-in Administrator account will be disabled automatically by this script, regardless of the name being changed or not (Account is looked up by SID not name) (Disabled not deleted in order to keep event log activities tied to a NAME and not just a SID)
-
-    Note all of the heavy lifting is coming from the library of functions here: https://github.com/dkbrookie/PowershellFunctions/blob/master/Library.Users.ps1
 #>
 
 [Net.ServicePointManager]::SecurityProtocol = [Enum]::ToObject([Net.SecurityProtocolType], 3072);
