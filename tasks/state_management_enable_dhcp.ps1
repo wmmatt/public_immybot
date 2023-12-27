@@ -22,7 +22,7 @@ switch ($method) {
         # Iterate over each network adapter
         foreach ($adapter in $networkAdapters) {
             # Retrieve the IP configuration for the current adapter
-            $ipConfig = $adapter | Get-NetIPConfiguration | Select-Object -ExpandProperty NetIPv4Interface
+            $ipConfig = ($adapter | Get-NetIPConfiguration).NetIPv4Interface
 
             # Check if DHCP is not enabled on the adapter
             if ($ipConfig.Dhcp -ne 'Enabled') {
@@ -45,7 +45,7 @@ switch ($method) {
         foreach ($adapter in $networkAdapters) {
             try {
                 # Retrieve the IP configuration for the current adapter
-                $ipConfig = $adapter | Get-NetIPConfiguration | Select-Object -ExpandProperty NetIPv4Interface
+                $ipConfig = ($adapter | Get-NetIPConfiguration).NetIPv4Interface
 
                 # Check if DHCP is not enabled on the adapter
                 if ($ipConfig.Dhcp -ne 'Enabled') {
