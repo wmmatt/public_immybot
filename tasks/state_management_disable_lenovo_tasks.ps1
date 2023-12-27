@@ -12,29 +12,45 @@
     -Lenovo\Vantage\Schedule\LenovoCompanionAppAddinDailyScheduleTask
 #>
 
+If (!$method) {
+    $method = 'test'
+}
 
 switch ($method) {
-    'test'{
+    'test' {
         $taskNames = @()
-        $taskNames = 'TVSUUpdateTask','TVSUUpdateTask_UserLogOn','GenericMessagingAddin','LenovoSystemUpdateAddin_WeeklyTask','DailyTelemetryTransmission','HeartbeatAddinDailyScheduleTask','Lenovo.Vantage.SmartPerformance.MonthlyReport','LenovoCompanionAppAddinDailyScheduleTask'
+        $taskNames = 
+            'TVSUUpdateTask',
+            'TVSUUpdateTask_UserLogOn',
+            'GenericMessagingAddin',
+            'LenovoSystemUpdateAddin_WeeklyTask',
+            'DailyTelemetryTransmission',
+            'HeartbeatAddinDailyScheduleTask',
+            'Lenovo.Vantage.SmartPerformance.MonthlyReport',
+            'LenovoCompanionAppAddinDailyScheduleTask'
 
         $taskNames | ForEach-Object {
-            $test = (Get-ScheduledTask -TaskName $_ -EA 0).state
-                If ($test -eq '3') {
-                    $status = 'failed'
-                }
-            }
+            $taskStates += (Get-ScheduledTask -TaskName $_ -EA 0).state
+        }
         
-        If ($status) {
+        If ($taskStates -contains 3) {
             Return $false
         } Else {
             Return $true
         }
-
     }
+
     'set' {
         $taskNames = @()
-        $taskNames = 'TVT\TVSUUpdateTask','TVT\TVSUUpdateTask_UserLogOn','Lenovo\Vantage\Schedule\GenericMessagingAddin','Lenovo\Vantage\Schedule\LenovoSystemUpdateAddin_WeeklyTask','Lenovo\Vantage\Schedule\DailyTelemetryTransmission','Lenovo\Vantage\Schedule\HeartbeatAddinDailyScheduleTask','Lenovo\Vantage\Schedule\Lenovo.Vantage.SmartPerformance.MonthlyReport','Lenovo\Vantage\Schedule\LenovoCompanionAppAddinDailyScheduleTask'
+        $taskNames = 
+            'TVSUUpdateTask',
+            'TVSUUpdateTask_UserLogOn',
+            'GenericMessagingAddin',
+            'LenovoSystemUpdateAddin_WeeklyTask',
+            'DailyTelemetryTransmission',
+            'HeartbeatAddinDailyScheduleTask',
+            'Lenovo.Vantage.SmartPerformance.MonthlyReport',
+            'LenovoCompanionAppAddinDailyScheduleTask'
 
         $taskNames | ForEach-Object {
             Disable-ScheduledTask -TaskName $_

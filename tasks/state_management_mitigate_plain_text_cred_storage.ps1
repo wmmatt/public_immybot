@@ -6,10 +6,13 @@
 
     This Task is designed to check the current configuration of the WDigest reg key for "UseLogonCredential", then to disable WDigest if it finds it is not already disabled.
 #>
-$method = 'test'
 $registryPath = 'HKLM:\\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest'
 $registryName = 'UseLogonCredential'
 $value = 0
+
+If (!$method) {
+    $method = 'test'
+}
 
 Switch ($method) {
     'test' {
