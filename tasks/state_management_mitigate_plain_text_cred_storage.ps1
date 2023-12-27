@@ -14,10 +14,17 @@ $registryName = 'UseLogonCredential'
 # Define the value to compare or set for the registry key
 $value = 0
 
+
 # Default method to 'test' if not specified
 If (!$method) {
     $method = 'test'
 }
+
+
+# Import required Confirm-RegistryValue function
+[Net.ServicePointManager]::SecurityProtocol = [Enum]::ToObject([Net.SecurityProtocolType], 3072)
+(New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/wmmatt/public-powershell-functions/main/Confirm-RegistryValue.ps1') | Invoke-Expression
+
 
 # Switch statement to handle different methods: 'test' or 'set'
 Switch ($method) {
