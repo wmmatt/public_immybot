@@ -7,6 +7,7 @@
     This Task is designed to check the current configuration of the WDigest reg key for "UseLogonCredential", then to disable WDigest if it finds it is not already disabled.
 #>
 
+
 # Define the registry path for the key to be checked or modified
 $registryPath = 'HKLM:\\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest'
 # Define the name of the registry key
@@ -27,7 +28,7 @@ If (!$method) {
 
 
 # Switch statement to handle different methods: 'test' or 'set'
-Switch ($method) {
+switch ($method) {
     # 'test' mode: check if the current registry value matches the specified value
     'test' {
         Confirm-RegistryValue -Path $registryPath -Name $registryName -Value $value -Method $method
