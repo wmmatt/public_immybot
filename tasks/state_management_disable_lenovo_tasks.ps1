@@ -12,12 +12,16 @@
     -Lenovo\Vantage\Schedule\LenovoCompanionAppAddinDailyScheduleTask
 #>
 
+# Set default method to 'test' if not specified
 If (!$method) {
     $method = 'test'
 }
 
+# Switch statement to handle the method specified
 switch ($method) {
+    # 'test' mode: Checks the state of specified scheduled tasks
     'test' {
+        # List of scheduled task names to check
         $taskNames = @()
         $taskNames = 
             'TVSUUpdateTask',
@@ -29,10 +33,13 @@ switch ($method) {
             'Lenovo.Vantage.SmartPerformance.MonthlyReport',
             'LenovoCompanionAppAddinDailyScheduleTask'
 
+        # Iterating over each task name to get their current state
+        $taskStates = @()
         $taskNames | ForEach-Object {
             $taskStates += (Get-ScheduledTask -TaskName $_ -EA 0).state
         }
         
+        # If any task state is '3' (Enabled), return $false, else $true
         If ($taskStates -contains 3) {
             Return $false
         } Else {
@@ -40,7 +47,9 @@ switch ($method) {
         }
     }
 
+    # 'set' mode: Disables the specified scheduled tasks
     'set' {
+        # List of scheduled task names to disable
         $taskNames = @()
         $taskNames = 
             'TVSUUpdateTask',
@@ -52,6 +61,7 @@ switch ($method) {
             'Lenovo.Vantage.SmartPerformance.MonthlyReport',
             'LenovoCompanionAppAddinDailyScheduleTask'
 
+        # Disabling each specified task
         $taskNames | ForEach-Object {
             Disable-ScheduledTask -TaskName $_
         }
