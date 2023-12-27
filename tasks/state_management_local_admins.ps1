@@ -12,7 +12,7 @@
 #>
 
 [Net.ServicePointManager]::SecurityProtocol = [Enum]::ToObject([Net.SecurityProtocolType], 3072);
-(New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/dkbrookie/PowershellFunctions/master/Library.Users.ps1') | Invoke-Expression
+(New-Object Net.WebClient).DownloadString('USERLIBRARYLINK.PS1') | Invoke-Expression
 $builtinAdmin = Get-BuiltInAdministrator
 
 # Split each param
